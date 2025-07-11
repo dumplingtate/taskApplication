@@ -31,10 +31,7 @@
     <last-used-providers />
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files>
-      <object connection-id="31ed4cf5-6f06-49d8-8772-2444ce880b29" object-ref="consoles/tasklist" />
-      <object connection-id="31ed4cf5-6f06-49d8-8772-2444ce880b29" object-ref="schemas/tasklist/tables/users" />
-    </open-files>
+    <open-files />
   </component>
   <component name="DBNavigator.Project.DatabaseSessionManager">
     <connection id="31ed4cf5-6f06-49d8-8772-2444ce880b29" />

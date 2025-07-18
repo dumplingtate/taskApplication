@@ -6,6 +6,13 @@ spring:
     driver-class-name: org.postgresql.Driver
   sql:
     init:
-      mode: always
+      mode: embedded
       continue-on-error: false
-      data-locations: classpath:demo-data.psql
+      data-locations: classpath:demo_data.psql
+
+security:
+  jwt:
+    secret: cXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcQ==
+    access: 3600000
+    refresh: 2592000000
+

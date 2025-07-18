@@ -10,7 +10,7 @@ public interface UserRepository {
     Optional<User> findByUsername(String username);
     void update(User user);
     void create(User user);
-    void inserUserRole(Long userId, Role role);
+    void insertUserRole(Long userId, Role role);
     boolean isTaskOwner(Long userId, Long taskId);
     long delete(Long id);
 }

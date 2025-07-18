@@ -24,14 +24,21 @@
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="31ed4cf5-6f06-49d8-8772-2444ce880b29">
-      <console name="tasklist" type="STANDARD" schema="tasklist" session="Main" />
+      <console name="tasklist" type="STANDARD" schema="tasklist" session="Main"><![CDATA[SELECT exists(
+SELECT 1
+FROM user_tasks
+WHERE user_id = :user_id
+AND task_id = :task_id
+)]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseEditorStateManager">
     <last-used-providers />
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files />
+    <open-files>
+      <object connection-id="31ed4cf5-6f06-49d8-8772-2444ce880b29" object-ref="consoles/tasklist" />
+    </open-files>
   </component>
   <component name="DBNavigator.Project.DatabaseSessionManager">
     <connection id="31ed4cf5-6f06-49d8-8772-2444ce880b29" />
@@ -40,6 +47,7 @@
     <filter-actions connection-id="31ed4cf5-6f06-49d8-8772-2444ce880b29" dataset="public.users" active-filter-id="" />
     <filter-actions connection-id="31ed4cf5-6f06-49d8-8772-2444ce880b29" dataset="tasklist.user_tasks" active-filter-id="" />
     <filter-actions connection-id="31ed4cf5-6f06-49d8-8772-2444ce880b29" dataset="information_schema.sql_parts" active-filter-id="" />
+    <filter-actions connection-id="31ed4cf5-6f06-49d8-8772-2444ce880b29" dataset="tasklist.users_roles" active-filter-id="" />
     <filter-actions connection-id="31ed4cf5-6f06-49d8-8772-2444ce880b29" dataset="tasklist.users" active-filter-id="a264aa0c-9a6c-4475-9f04-d378bc05b10e">
       <filter id="a264aa0c-9a6c-4475-9f04-d378bc05b10e" name="10" temporary="false" custom-name="false" type="basic" join-type="AND">
         <condition column="id" operator="&lt;" value="10" active="true" />
@@ -51,7 +59,6 @@
   </component>
   <component name="DBNavigator.Project.FileConnectionMappingManager">
     <mapping file-url="file://$PROJECT_DIR$/tasklist/src/main/resources/schema.psql" connection-id="31ed4cf5-6f06-49d8-8772-2444ce880b29" session-id="MAIN" current-schema="tasklist" />
-    <mapping file-url="file://$PROJECT_DIR$/tasklist/src/main/resources/demo_data.sql" connection-id="31ed4cf5-6f06-49d8-8772-2444ce880b29" session-id="MAIN" current-schema="tasklist" />
   </component>
   <component name="DBNavigator.Project.ObjectQuickFilterManager">
     <last-used-operator value="EQUAL" />
@@ -597,7 +604,34 @@
     </general-settings>
   </component>
   <component name="DBNavigator.Project.StatementExecutionManager">
-    <execution-variables />
-    <execution-variable-types />
+    <execution-variables>
+      <file file-url="db://31ed4cf5-6f06-49d8-8772-2444ce880b29/consoles/tasklist">
+        <variable name="id" data-type="LITERAL">
+          <value>1</value>
+          <value>2</value>
+        </variable>
+        <variable name="task_id" data-type="LITERAL">
+          <value>4</value>
+          <value>3</value>
+          <value>2</value>
+          <value>1</value>
+        </variable>
+        <variable name="user_id" data-type="LITERAL">
+          <value>1</value>
+          <value>2</value>
+          <value>4</value>
+          <value>3</value>
+        </variable>
+        <variable name="username" data-type="LITERAL">
+          <value>John Doe</value>
+        </variable>
+      </file>
+    </execution-variables>
+    <execution-variable-types>
+      <variable connection-id="31ed4cf5-6f06-49d8-8772-2444ce880b29" name="user_id" data-type="LITERAL" />
+      <variable connection-id="31ed4cf5-6f06-49d8-8772-2444ce880b29" name="task_id" data-type="LITERAL" />
+      <variable connection-id="31ed4cf5-6f06-49d8-8772-2444ce880b29" name="id" data-type="LITERAL" />
+      <variable connection-id="31ed4cf5-6f06-49d8-8772-2444ce880b29" name="username" data-type="LITERAL" />
+    </execution-variable-types>
   </component>
 </project>

@@ -12,18 +12,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/tasks")
-//@RequiredArgsConstructor //задает конструктор для всех final полей
+@RequiredArgsConstructor //задает конструктор для всех final полей
 @Validated //включение валидации параметров
 public class TaskController {
 
     private final TaskService taskService;
     private final TaskMapper taskMapper;
-
-    @Autowired
-    public TaskController(TaskService taskService, TaskMapper taskMapper) {
-        this.taskService = taskService;
-        this.taskMapper = taskMapper;
-    }
 
     @PutMapping //по базовому пути контроллера
     public TaskDto update(@Validated(OnUpdate.class) @RequestBody TaskDto dto){

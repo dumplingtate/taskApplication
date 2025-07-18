@@ -19,7 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
-//@RequiredArgsConstructor //задает конструктор для всех final полей
+@RequiredArgsConstructor //задает конструктор для всех final полей
 @Validated //включение валидации параметров
 public class UserController {
     private final UserService userService;
@@ -28,13 +28,6 @@ public class UserController {
     private final UserMapper userMapper;
     private final TaskMapper taskMapper;
 
-    @Autowired
-    public UserController(TaskService taskService, TaskMapper taskMapper, UserService userService, UserMapper userMapper) {
-        this.taskService = taskService;
-        this.taskMapper = taskMapper;
-        this.userService = userService;
-        this.userMapper = userMapper;
-    }
 
     @PutMapping //по базовому пути контроллера
     public UserDto update(@Validated(OnUpdate.class) @RequestBody UserDto dto){

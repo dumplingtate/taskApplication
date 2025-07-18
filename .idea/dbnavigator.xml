@@ -24,12 +24,21 @@
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="31ed4cf5-6f06-49d8-8772-2444ce880b29">
-      <console name="tasklist" type="STANDARD" schema="tasklist" session="Main"><![CDATA[SELECT exists(
-SELECT 1
-FROM user_tasks
-WHERE user_id = :user_id
-AND task_id = :task_id
-)]]></console>
+      <console name="tasklist" type="STANDARD" schema="tasklist" session="Main"><![CDATA[SELECT u.id as user_id,
+                        u.name as user_name,
+                        u.password as user_password,
+                        u.username as user_username,
+                        ur.role as user_role_role,
+                        t.id as task_id,
+                        t.title as task_title,
+                        t.description as task_description,
+                        t.expiration_date as task_expiration_date,
+                        t.status as task_status
+                        FROM users u
+            LEFT JOIN users_roles ur on u.id = ur.user_id
+            LEFT JOIN user_tasks ut on u.id = ut.user_id
+            LEFT JOIN tasks t on ut.task_id = t.id
+            WHERE u.id = :id]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseEditorStateManager">

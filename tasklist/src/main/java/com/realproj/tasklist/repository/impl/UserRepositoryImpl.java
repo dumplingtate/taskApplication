@@ -1,9 +1,11 @@
 package com.realproj.tasklist.repository.impl;
 
+import com.realproj.tasklist.domain.exception.ResourceMappingException;
 import com.realproj.tasklist.domain.user.Role;
 import com.realproj.tasklist.domain.user.User;
 import com.realproj.tasklist.repository.DataSourceConfig;
 import com.realproj.tasklist.repository.UserRepository;
+import com.realproj.tasklist.repository.mappers.UserRowMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -25,7 +27,7 @@ public class UserRepositoryImpl implements UserRepository {
                         u.name as user_name,
                         u.password as user_password,
                         u.username as user_username,
-                        ur.role as user_role,
+                        ur.role as user_role_role,
                         t.id as task_id,
                         t.title as task_title,
                         t.description as task_description,
@@ -43,7 +45,7 @@ public class UserRepositoryImpl implements UserRepository {
                         u.name as user_name,
                         u.password as user_password,
                         u.username as user_username,
-                        ur.role as user_role,
+                        ur.role as user_role_role,
                         t.id as task_id,
                         t.title as task_title,
                         t.description as task_description,
@@ -95,39 +97,105 @@ public class UserRepositoryImpl implements UserRepository {
             Connection connection = dataSourceConfig.getConection();
             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_ID, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             preparedStatement.setLong(1, id);
+            try(ResultSet resultSet = preparedStatement.executeQuery()){
+                return Optional.ofNullable(UserRowMapper.mapRow(resultSet));
+            }
         } catch(SQLException throwables){
-            throwables.printStackTrace();
+            throw  new ResourceMappingException("Error while finding by id");
         }
-        return null;
     }
 
     @Override
     public Optional<User> findByUsername(String username) {
-        return Optional.empty();
+        try{
+            Connection connection = dataSourceConfig.getConection();
+            PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_USERNAME, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            preparedStatement.setString(1, username);
+            try(ResultSet resultSet = preparedStatement.executeQuery()){
+                return Optional.ofNullable(UserRowMapper.mapRow(resultSet));
+            }
+        } catch(SQLException throwables){
+            throw  new ResourceMappingException("Error while finding by username");
+        }
     }
 
     @Override
     public void update(User user) {
+        try{
+            Connection connection = dataSourceConfig.getConection();
+            PreparedStatement preparedStatement = connection.prepareStatement(UPDATE);
+            preparedStatement.setString(1, user.getName());
+            preparedStatement.setString(2, user.getUsername());
+            preparedStatement.setString(3, user.getPassword());
+            preparedStatement.setLong(4, user.getId());
+            try(ResultSet resultSet = preparedStatement.executeQuery()){
 
+            }
+        } catch(SQLException throwables){
+            throw  new ResourceMappingException("Error while updating");
+        }
     }
 
     @Override
     public void create(User user) {
+        try{
+            Connection connection = dataSourceConfig.getConection();
+            PreparedStatement preparedStatement = connection.prepareStatement(CREATE);
+            preparedStatement.setString(1, user.getName());
+            preparedStatement.setString(2, user.getUsername());
+            preparedStatement.setString(3, user.getPassword());
+            preparedStatement.executeUpdate();
+            try(ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
+                resultSet.next();
+                user.setId(resultSet.getLong(1));
+            }
+            try(ResultSet resultSet = preparedStatement.executeQuery()){
 
+            }
+        } catch(SQLException throwables){
+            throw  new ResourceMappingException("Error while creating");
+        }
     }
 
     @Override
     public void insertUserRole(Long userId, Role role) {
+        try{
+            Connection connection = dataSourceConfig.getConection();
+            PreparedStatement preparedStatement = connection.prepareStatement(INSERT_USER_ROLE);
+            preparedStatement.setLong(1, userId);
+            preparedStatement.setString(2, role.name());
+            preparedStatement.executeUpdate();
+        } catch(SQLException throwables){
+            throw  new ResourceMappingException("Error while inserting user role");
+        }
 
     }
 
     @Override
     public boolean isTaskOwner(Long userId, Long taskId) {
-        return false;
+        try{
+            Connection connection = dataSourceConfig.getConection();
+            PreparedStatement preparedStatement = connection.prepareStatement(INSERT_USER_ROLE);
+            preparedStatement.setLong(1, userId);
+            preparedStatement.setLong(2, taskId);
+            try(ResultSet resultSet = preparedStatement.executeQuery()){
+                resultSet.next();
+                return resultSet.getBoolean(1);
+            }
+        } catch(SQLException throwables){
+            throw  new ResourceMappingException("Error while searching");
+        }
     }
 
     @Override
-    public long delete(Long id) {
-        return 0;
+    public void delete(Long id) {
+        try{
+            Connection connection = dataSourceConfig.getConection();
+            PreparedStatement preparedStatement = connection.prepareStatement(DELETE);
+            preparedStatement.setLong(1, id);
+            preparedStatement.executeUpdate();
+        } catch(SQLException throwables){
+            throw  new ResourceMappingException("Error while inserting user role");
+        }
     }
 }

@@ -13,7 +13,7 @@ import java.sql.*;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+//@Repository
 @RequiredArgsConstructor
 public class TaskRepositoryImpl implements TaskRepository  {
 
@@ -25,9 +25,9 @@ public class TaskRepositoryImpl implements TaskRepository  {
             t.title as task_title,
             t.description as task_description,
             t.expiration_date as task_expiration_date,
-            t.status as task_status\s
+            t.status as task_status
             FROM tasks t
-            WHERE id = :id
+            WHERE t.id = ?
             """;
 
     private final String FIND_ALL_BY_USER_ID = """
@@ -35,35 +35,35 @@ public class TaskRepositoryImpl implements TaskRepository  {
             t.title as task_title,
             t.description as task_description,
             t.expiration_date as task_expiration_date,
-            t.status as task_status\s
+            t.status as task_status
             FROM tasks t
             JOIN user_tasks ut ON t.id = ut.task_id
-            WHERE ut.user_id = :user_id
+            WHERE ut.user_id = ?
             """;
 
     private final String ASSIGN= """
             INSERT INTO user_tasks (task_id, user_id)
-            VALUES (:task_id, :user_id)
+            VALUES (?, ?)
             """;
 
     private final String UPDATE= """
             UPDATE tasks
-            SET title = :title,
-            description = :description,
-            expiration_date = :expiration_date,
-            status = :status
-            WHERE id = :id
+            SET title = ?,
+            description = ?,
+            expiration_date = ?,
+            status = ?
+            WHERE id = ?
             """;
 
 
     private final String CREATE= """
             INSERT INTO tasks (description, expiration_date, status, title)
-            VALUES (:description, :expiration_date, :status, :title)
+            VALUES (?, ?, ?, ?)
             """;
 
     private final String DELETE= """
             DELETE FROM tasks
-            WHERE id = :id
+            WHERE id = ?
             """;
 
     @Override
@@ -81,16 +81,18 @@ public class TaskRepositoryImpl implements TaskRepository  {
     }
 
     @Override
-    public List<Task> findAllByUserId(Long id) {
+    public List<Task> findAllByUserId(Long userId) {
         try{
             Connection connection = dataSourceConfig.getConection();
+            //System.out.println("Connection получен: " + connection);
             PreparedStatement statement = connection.prepareStatement(FIND_ALL_BY_USER_ID);
-            statement.setLong(1, id);
+            statement.setLong(1, userId);
             try (ResultSet resultSet = statement.executeQuery()){
                 return TaskRowMapper.mapRows(resultSet);
             }
         } catch (SQLException throwables){
-            throw  new ResourceMappingException("Error while finding by id");
+            throwables.printStackTrace();
+            throw  new ResourceMappingException("Error while finding by id. " + throwables.getMessage());
         }
     }
 
@@ -119,11 +121,11 @@ public class TaskRepositoryImpl implements TaskRepository  {
             else {
                 statement.setString(2, task.getDescription());
             }
-            if(task.getExpirationData()==null){
+            if(task.getExpirationDate()==null){
                 statement.setNull(3, Types.TIMESTAMP);
             }
             else {
-                statement.setTimestamp(3, Timestamp.valueOf(task.getExpirationData()));
+                statement.setTimestamp(3, Timestamp.valueOf(task.getExpirationDate()));
             }
             statement.setString(4, task.getStatus().name());
             statement.setLong(5, task.getId());
@@ -139,20 +141,20 @@ public class TaskRepositoryImpl implements TaskRepository  {
         try{
             Connection connection = dataSourceConfig.getConection();
             PreparedStatement statement = connection.prepareStatement(CREATE, PreparedStatement.RETURN_GENERATED_KEYS);
-            statement.setString(1, task.getTitle());
+            statement.setString(4, task.getTitle());
             if(task.getDescription()==null){
-                statement.setNull(2, Types.VARCHAR);
+                statement.setNull(1, Types.VARCHAR);
             }
             else {
-                statement.setString(2, task.getDescription());
+                statement.setString(1, task.getDescription());
             }
-            if(task.getExpirationData()==null){
-                statement.setNull(3, Types.TIMESTAMP);
+            if(task.getExpirationDate()==null){
+                statement.setNull(2, Types.TIMESTAMP);
             }
             else {
-                statement.setTimestamp(3, Timestamp.valueOf(task.getExpirationData()));
+                statement.setTimestamp(2, Timestamp.valueOf(task.getExpirationDate()));
             }
-            statement.setString(4, task.getStatus().name());
+            statement.setString(3, task.getStatus().name());
 
             statement.executeUpdate();
 
@@ -161,7 +163,7 @@ public class TaskRepositoryImpl implements TaskRepository  {
                 task.setId(resultSet.getLong(1));
             }
         } catch (SQLException throwables){
-            throw  new ResourceMappingException("Error while creating task");
+            throw  new ResourceMappingException("Error while creating task" + throwables.getMessage());
         }
     }
 

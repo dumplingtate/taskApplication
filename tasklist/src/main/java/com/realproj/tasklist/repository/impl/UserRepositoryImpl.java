@@ -7,7 +7,9 @@ import com.realproj.tasklist.repository.DataSourceConfig;
 import com.realproj.tasklist.repository.UserRepository;
 import com.realproj.tasklist.repository.mappers.UserRowMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,7 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 
-@Repository
+//@Repository   //убрали из-за mybatis
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepository {
 
@@ -37,7 +39,7 @@ public class UserRepositoryImpl implements UserRepository {
             LEFT JOIN users_roles ur on u.id = ur.user_id
             LEFT JOIN user_tasks ut on u.id = ut.user_id
             LEFT JOIN tasks t on ut.task_id = t.id
-            WHERE u.id = :id
+            WHERE u.id = ?
             """;
 
     private final String  FIND_BY_USERNAME = """
@@ -55,39 +57,39 @@ public class UserRepositoryImpl implements UserRepository {
             LEFT JOIN users_roles ur on u.id = ur.user_id
             LEFT JOIN user_tasks ut on u.id = ut.user_id
             LEFT JOIN tasks t on ut.task_id = t.id
-            WHERE u.username = :username
+            WHERE u.username = ?
             """;
 
     private final String UPDATE = """
             UPDATE users
-            SET name = :name,
-            username = :username,
-            password = :password,
-            WHERE id = :id
+            SET name = ?,
+            username = ?,
+            password = ?,
+            WHERE id = ?
             """;
 
     private final String CREATE = """
             INSERT INTO users (name, username, password)
-            VALUES (:name, :username: :password)
+            VALUES (?, ?, ?)
             """;
 
     private final String INSERT_USER_ROLE = """
-            INSERT INTO users_roles (role)
-            VALUES (:role)
+            INSERT INTO users_roles (user_id, role)
+            VALUES (?, ?)
             """;
 
     private final String IS_TASK_OWNER= """
             SELECT exists(
             SELECT 1
             FROM user_tasks
-            WHERE user_id = :user_id
-            AND task_id = :task_id
+            WHERE user_id = ?
+            AND task_id = ?
             )
             """;
 
     private final String DELETE= """
             DELETE FROM users
-            WHERE id = :id
+            WHERE id = ?
             """;
 
 
@@ -105,17 +107,27 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 
+
     @Override
     public Optional<User> findByUsername(String username) {
-        try{
+        System.out.println("findByUsername вызван с username = " + username);
+        try {
             Connection connection = dataSourceConfig.getConection();
             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_USERNAME, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             preparedStatement.setString(1, username);
-            try(ResultSet resultSet = preparedStatement.executeQuery()){
-                return Optional.ofNullable(UserRowMapper.mapRow(resultSet));
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                System.out.println("Результат запроса получен");
+                User user = UserRowMapper.mapRow(resultSet);
+                if (user == null) {
+                    System.out.println("Пользователь не найден в БД");
+                    return Optional.empty();
+                } else {
+                    System.out.println("Пользователь найден: " + user.getUsername());
+                    return Optional.of(user);
+                }
             }
-        } catch(SQLException throwables){
-            throw  new ResourceMappingException("Error while finding by username");
+        } catch(SQLException throwables) {
+            throw new UsernameNotFoundException("User not found by username: " + username, throwables);
         }
     }
 
@@ -175,7 +187,7 @@ public class UserRepositoryImpl implements UserRepository {
     public boolean isTaskOwner(Long userId, Long taskId) {
         try{
             Connection connection = dataSourceConfig.getConection();
-            PreparedStatement preparedStatement = connection.prepareStatement(INSERT_USER_ROLE);
+            PreparedStatement preparedStatement = connection.prepareStatement(IS_TASK_OWNER);
             preparedStatement.setLong(1, userId);
             preparedStatement.setLong(2, taskId);
             try(ResultSet resultSet = preparedStatement.executeQuery()){
@@ -198,4 +210,6 @@ public class UserRepositoryImpl implements UserRepository {
             throw  new ResourceMappingException("Error while inserting user role");
         }
     }
+
+
 }

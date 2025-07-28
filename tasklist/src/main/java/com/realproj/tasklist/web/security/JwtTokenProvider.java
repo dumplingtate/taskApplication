@@ -21,7 +21,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import javax.crypto.SecretKey;
 import java.security.Key;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -44,16 +47,21 @@ public class JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
     }
 
-    public String createAccessToken(Long userId, String username, Set<Role> roles){
-        Claims claims = (Claims) Jwts.claims().setSubject(username);
-        claims.put("id", userId);
-        claims.put("roles", resolveRoles(roles));
-        Date now = new Date();
-        Date validity = new Date(now.getTime()+jwtProperties.getAccess());
+    public String createAccessToken(
+            final Long userId,
+            final String username,
+            final Set<Role> roles
+    ) {
+        Claims claims = Jwts.claims()
+                .subject(username)
+                .add("id", userId)
+                .add("roles", resolveRoles(roles))
+                .build();
+        Instant validity = Instant.now()
+                .plus(jwtProperties.getAccess(), ChronoUnit.HOURS);
         return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(now)
-                .setExpiration(validity)
+                .claims(claims)
+                .expiration(Date.from(validity))
                 .signWith(key)
                 .compact();
     }
@@ -65,22 +73,26 @@ public class JwtTokenProvider {
                 .collect(Collectors.toList());
     }
 
-    public String createRefreshToken(Long userId, String username){
-        Claims claims = (Claims) Jwts.claims().setSubject(username);
-        claims.put("id", userId);
-        Date now = new Date();
-        Date validity = new Date(now.getTime()+jwtProperties.getAccess());
+    public String createRefreshToken(
+            final Long userId,
+            final String username
+    ) {
+        Claims claims = Jwts.claims()
+                .subject(username)
+                .add("id", userId)
+                .build();
+        Instant validity = Instant.now()
+                .plus(jwtProperties.getRefresh(), ChronoUnit.DAYS);
         return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(now)
-                .setExpiration(validity)
+                .claims(claims)
+                .expiration(Date.from(validity))
                 .signWith(key)
                 .compact();
     }
 
     public JwtResponse refreshUserTokens(String refreshToken) {
         JwtResponse jwtResponse = new JwtResponse();
-        if(!validateToken(refreshToken)){
+        if(!isValid(refreshToken)){
             throw new AccessDeniedException();
         }
         Long userId = Long.valueOf(getId(refreshToken));
@@ -100,24 +112,40 @@ public class JwtTokenProvider {
         return !claims.getBody().getExpiration().before(new Date());
     }
 
-    private String getId(String token) {
-        return Jwts
+    public boolean isValid(
+            final String token
+    ) {
+        Jws<Claims> claims = Jwts
                 .parser()
-                .setSigningKey(key)
+                .verifyWith((SecretKey) key)
                 .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .get("id")
-                .toString();
+                .parseSignedClaims(token);
+        return claims.getPayload()
+                .getExpiration()
+                .after(new Date());
     }
 
-    public String getUsername(String token){
+    private String getId(
+            final String token
+    ) {
         return Jwts
                 .parser()
-                .setSigningKey(key)
+                .verifyWith((SecretKey) key)
                 .build()
-                .parseClaimsJws(token)
-                .getBody()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("id", String.class);
+    }
+
+    private String getUsername(
+            final String token
+    ) {
+        return Jwts
+                .parser()
+                .verifyWith((SecretKey) key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
                 .getSubject();
     }
 

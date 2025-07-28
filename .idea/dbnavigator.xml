@@ -38,7 +38,7 @@
             LEFT JOIN users_roles ur on u.id = ur.user_id
             LEFT JOIN user_tasks ut on u.id = ut.user_id
             LEFT JOIN tasks t on ut.task_id = t.id
-            WHERE u.id = :id]]></console>
+            WHERE u.username = :username]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseEditorStateManager">
@@ -54,6 +54,7 @@
     <filter-actions connection-id="31ed4cf5-6f06-49d8-8772-2444ce880b29" dataset="public.users" active-filter-id="" />
     <filter-actions connection-id="31ed4cf5-6f06-49d8-8772-2444ce880b29" dataset="tasklist.user_tasks" active-filter-id="" />
     <filter-actions connection-id="31ed4cf5-6f06-49d8-8772-2444ce880b29" dataset="information_schema.sql_parts" active-filter-id="" />
+    <filter-actions connection-id="31ed4cf5-6f06-49d8-8772-2444ce880b29" dataset="tasklist.databasechangelog" active-filter-id="" />
     <filter-actions connection-id="31ed4cf5-6f06-49d8-8772-2444ce880b29" dataset="tasklist.users_roles" active-filter-id="" />
     <filter-actions connection-id="31ed4cf5-6f06-49d8-8772-2444ce880b29" dataset="tasklist.users" active-filter-id="a264aa0c-9a6c-4475-9f04-d378bc05b10e">
       <filter id="a264aa0c-9a6c-4475-9f04-d378bc05b10e" name="10" temporary="false" custom-name="false" type="basic" join-type="AND">
@@ -66,6 +67,8 @@
   </component>
   <component name="DBNavigator.Project.FileConnectionMappingManager">
     <mapping file-url="file://$PROJECT_DIR$/tasklist/src/main/resources/schema.psql" connection-id="31ed4cf5-6f06-49d8-8772-2444ce880b29" session-id="MAIN" current-schema="tasklist" />
+    <mapping file-url="file://$PROJECT_DIR$/tasklist/src/main/resources/db-init/initdb.sql" connection-id="31ed4cf5-6f06-49d8-8772-2444ce880b29" session-id="MAIN" current-schema="tasklist" />
+    <mapping file-url="file://$PROJECT_DIR$/tasklist/src/main/resources/liquibase/changesets/V1__init.sql" connection-id="31ed4cf5-6f06-49d8-8772-2444ce880b29" session-id="MAIN" current-schema="tasklist" />
   </component>
   <component name="DBNavigator.Project.ObjectQuickFilterManager">
     <last-used-operator value="EQUAL" />
@@ -326,12 +329,19 @@
           <content-type name="DTD" enabled="true" />
           <content-type name="HTML" enabled="true" />
           <content-type name="XHTML" enabled="true" />
+          <content-type name="CSS" enabled="true" />
           <content-type name="Java" enabled="true" />
           <content-type name="SQL" enabled="true" />
           <content-type name="PL/SQL" enabled="true" />
+          <content-type name="JPA QL" enabled="true" />
+          <content-type name="JavaScript" enabled="true" />
           <content-type name="JSON" enabled="true" />
           <content-type name="JSON5" enabled="true" />
+          <content-type name="JSP" enabled="true" />
+          <content-type name="JSPx" enabled="true" />
           <content-type name="Groovy" enabled="true" />
+          <content-type name="FTL" enabled="true" />
+          <content-type name="VTL" enabled="true" />
           <content-type name="YAML" enabled="true" />
           <content-type name="Manifest" enabled="true" />
         </content-types>
@@ -630,6 +640,7 @@
           <value>3</value>
         </variable>
         <variable name="username" data-type="LITERAL">
+          <value>johndoe@gmail.com</value>
           <value>John Doe</value>
         </variable>
       </file>

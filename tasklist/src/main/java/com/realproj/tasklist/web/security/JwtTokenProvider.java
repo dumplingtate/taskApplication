@@ -66,7 +66,6 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-
     private List<String> resolveRoles(Set<Role> roles){
         return roles.stream()
                 .map(Enum::name)

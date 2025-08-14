@@ -33,13 +33,10 @@ public class JwtTokenFilter extends GenericFilterBean {
             bearerToken = bearerToken.substring(7);
         }
         try {
-            if (bearerToken != null
-                    && jwtTokenProvider.isValid(bearerToken)) {
-                Authentication authentication
-                        = jwtTokenProvider.getAuthentication(bearerToken);
+            if (bearerToken != null && jwtTokenProvider.isValid(bearerToken)) {
+                Authentication authentication = jwtTokenProvider.getAuthentication(bearerToken);
                 if (authentication != null) {
-                    SecurityContextHolder.getContext()
-                            .setAuthentication(authentication);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
         } catch (Exception ignored) {

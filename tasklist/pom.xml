@@ -65,8 +65,6 @@
 			<scope>test</scope>
 		</dependency>
 
-
-
 		<dependency>
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct</artifactId>
@@ -79,9 +77,6 @@
 			<version>1.6.3</version>
 			<scope>provided</scope>
 		</dependency>
-
-
-
 
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
@@ -100,7 +95,6 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 			<version>3.5.3</version>
 		</dependency>
-
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -153,6 +147,11 @@
 		</dependency>
 
 
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+			<version>3.5.3</version>
+		</dependency>
 
 
 	</dependencies>
